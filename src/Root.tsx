@@ -2,12 +2,21 @@ import { Composition, Folder } from "remotion";
 import { HelloWorld } from "./HelloWorld";
 import { Logo } from "./HelloWorld/Logo";
 import { Title } from "./HelloWorld/Title";
+import { GoBoilerplatePromo } from "./GoBoilerplatePromo";
 
 // Each <Composition> is an entry in the sidebar!
 
 export const RemotionRoot: React.FC = () => {
   return (
     <>
+      <Composition
+        id="GoBoilerplatePromo"
+        component={GoBoilerplatePromo}
+        durationInFrames={1350}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
       <Folder name="Elements">
         <Composition
           id="Logo"
@@ -50,7 +59,6 @@ export const RemotionRoot: React.FC = () => {
           titleColor: "#000000",
         }}
       />
-
     </>
   );
 };
