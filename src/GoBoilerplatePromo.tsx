@@ -54,6 +54,92 @@ const Rise: React.FC<
   );
 };
 
+// Ikon ↻ yang berputar pelan — menegaskan kesan "diulang terus".
+const Spinner: React.FC = () => {
+  const frame = useCurrentFrame();
+  return (
+    <span
+      style={{
+        fontSize: 44,
+        color: C.muted,
+        display: "inline-block",
+        rotate: `${frame * 2.4}deg`,
+      }}
+    >
+      ↻
+    </span>
+  );
+};
+
+// Panah alur yang naik-turun halus, mengalir dari kartu ke kartu.
+const FlowArrow: React.FC = () => {
+  const frame = useCurrentFrame();
+  return (
+    <span
+      style={{
+        marginLeft: "auto",
+        color: C.mint,
+        fontSize: 40,
+        translate: `0 ${Math.sin(frame / 16) * 8}px`,
+      }}
+    >
+      ↓
+    </span>
+  );
+};
+
+// Ikon yang "pop" memakai spring saat pertama muncul.
+const Pop: React.FC<React.PropsWithChildren<{ delay?: number }>> = ({
+  children,
+  delay = 0,
+}) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const s = spring({
+    frame: frame - delay,
+    fps,
+    config: { damping: 12, stiffness: 160 },
+  });
+  return (
+    <div style={{ scale: `${interpolate(s, [0, 1], [0.4, 1])}` }}>
+      {children}
+    </div>
+  );
+};
+
+// Sapuan cahaya miring yang berulang di atas tombol CTA.
+const Shimmer: React.FC = () => {
+  const frame = useCurrentFrame();
+  const t = (frame - 70 + 120) % 120;
+  const x = interpolate(t, [0, 80], [-40, 110], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  return (
+    <div
+      style={{
+        position: "absolute",
+        inset: 0,
+        overflow: "hidden",
+        borderRadius: 24,
+        pointerEvents: "none",
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          bottom: 0,
+          left: `${x}%`,
+          width: "25%",
+          background:
+            "linear-gradient(100deg, transparent, #ffffff26, transparent)",
+        }}
+      />
+    </div>
+  );
+};
+
 const Backdrop: React.FC = () => {
   const frame = useCurrentFrame();
   return (
@@ -102,12 +188,28 @@ const Scene: React.FC<
 > = ({ children, number, category, duration }) => {
   const frame = useCurrentFrame();
   // Fade-out lembut di akhir scene agar transisi antar scene tidak hard cut.
-  const fade = interpolate(frame, [duration - 14, duration - 1], [1, 0], {
+  const fadeOut = interpolate(frame, [duration - 14, duration - 1], [1, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const fadeIn = interpolate(frame, [0, 8], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  // Zoom lambat sepanjang scene (efek Ken Burns) supaya frame terasa hidup.
+  const zoom = interpolate(frame, [0, duration], [1, 1.035], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
   return (
-    <AbsoluteFill style={{ color: C.paper, fontFamily: FONT, opacity: fade }}>
+    <AbsoluteFill
+      style={{
+        color: C.paper,
+        fontFamily: FONT,
+        opacity: fadeIn * fadeOut,
+        transform: `scale(${zoom})`,
+      }}
+    >
       <Backdrop />
       <div
         style={{
@@ -175,6 +277,7 @@ const Scene: React.FC<
 
 const Hook: React.FC = () => {
   const { fps } = useVideoConfig();
+  const frame = useCurrentFrame();
   return (
     <Scene number="01" category="MULAI PROYEK BARU?" duration={6 * fps}>
       <Rise style={{ position: "absolute", left: 90, top: 360 }}>
@@ -188,7 +291,32 @@ const Hook: React.FC = () => {
         >
           Setup lagi.
           <br />
-          <span style={{ color: C.mint }}>Dari nol lagi?</span>
+          <span
+            style={{
+              color: C.mint,
+              position: "relative",
+              display: "inline-block",
+            }}
+          >
+            Dari nol lagi?
+            <div
+              style={{
+                position: "absolute",
+                left: 0,
+                right: 0,
+                bottom: -10,
+                height: 9,
+                borderRadius: 5,
+                background: C.mint,
+                opacity: 0.35,
+                transform: `scaleX(${interpolate(frame, [22, 48], [0, 1], {
+                  extrapolateLeft: "clamp",
+                  extrapolateRight: "clamp",
+                })})`,
+                transformOrigin: "left",
+              }}
+            />
+          </span>
         </div>
       </Rise>
       <div style={{ position: "absolute", top: 800, left: 90, right: 90 }}>
@@ -207,7 +335,7 @@ const Hook: React.FC = () => {
                   padding: "0 32px",
                 }}
               >
-                <span style={{ fontSize: 44, color: C.muted }}>↻</span>
+                <Spinner />
                 <span style={{ fontSize: 43, fontWeight: 500 }}>{item}</span>
               </div>
             </Rise>
@@ -283,9 +411,7 @@ const Architecture: React.FC = () => {
                   {description}
                 </div>
               </div>
-              <span style={{ marginLeft: "auto", color: C.mint, fontSize: 40 }}>
-                ↓
-              </span>
+              <FlowArrow />
             </div>
           </Rise>
         ))}
@@ -327,7 +453,11 @@ const TerminalLine: React.FC<{
       }}
     >
       {text.slice(0, count)}
-      {frame >= start && count < text.length ? "▌" : ""}
+      {frame >= start && count < text.length ? (
+        <span style={{ opacity: Math.floor(frame / 8) % 2 === 0 ? 1 : 0 }}>
+          ▌
+        </span>
+      ) : null}
     </div>
   );
 };
@@ -415,6 +545,13 @@ const Migrations: React.FC = () => {
             <TerminalLine start={180} text="-- migrate:down" color={C.cyan} />
             <TerminalLine start={200} text="ALTER TABLE users" />
             <TerminalLine start={220} text="DROP COLUMN phone;" />
+            <div style={{ height: 22 }} />
+            <TerminalLine start={240} text="$ make migrate" color={C.mint} />
+            <TerminalLine
+              start={262}
+              text="✓ applied 000004 (0.4s)"
+              color={C.mint}
+            />
           </div>
         </div>
       </Rise>
@@ -480,17 +617,19 @@ const Features: React.FC = () => {
                 background: i === 0 ? "#1a2a20" : "#121e22",
               }}
             >
-              <div
-                style={{
-                  color: C.mint,
-                  fontFamily: MONO,
-                  fontSize: 43,
-                  fontWeight: 700,
-                  marginBottom: 32,
-                }}
-              >
-                {icon}
-              </div>
+              <Pop delay={15 + i * 16}>
+                <div
+                  style={{
+                    color: C.mint,
+                    fontFamily: MONO,
+                    fontSize: 43,
+                    fontWeight: 700,
+                    marginBottom: 32,
+                  }}
+                >
+                  {icon}
+                </div>
+              </Pop>
               <div
                 style={{ fontSize: 41, fontWeight: 700, whiteSpace: "nowrap" }}
               >
@@ -595,6 +734,7 @@ const Clone: React.FC = () => {
       >
         <div
           style={{
+            position: "relative",
             background: C.mint,
             color: C.bg,
             borderRadius: 24,
@@ -608,6 +748,7 @@ const Clone: React.FC = () => {
           git clone {"\\"}
           <br />
           https://github.com/Nzrkodi/GO-boilerplate.git
+          <Shimmer />
         </div>
         <div style={{ color: C.muted, fontSize: 38, marginTop: 35 }}>
           Ikuti README. Mulai proyekmu.

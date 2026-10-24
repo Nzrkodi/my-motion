@@ -38,9 +38,16 @@ Narasi berupa suara sintetis. Untuk menggunakan suara rekaman sendiri, ganti WAV
 
 1. Mulai proyek Go, tapi setup backend selalu diulang dari nol?
 2. Kenalan dengan Go Boilerplate. Fiber, PostgreSQL, dan Redis, dengan struktur handler, service, dan repository yang tertata.
-3. Buat migration cukup satu perintah. Isi bagian up dan down dalam satu file. Lalu jalankan, rollback, atau reset schema saat development.
-4. Sudah dilengkapi seed, logging, request ID, Docker, test, dan CI. Tinggal sesuaikan fondasinya untuk kebutuhan proyekmu.
+3. Buat migration cukup satu perintah. Isi bagian up dan down dalam satu file. Lalu jalankan, rollback, atau reset schema saat development.4. Sudah dilengkapi seed, logging, request ID, Docker, test, dan CI. Tinggal sesuaikan fondasinya untuk kebutuhan proyekmu.
 5. Lihat source code-nya di GitHub, Nzrkodi, Go Boilerplate. Clone repositorinya, ikuti README, dan mulai bangun backend Go kamu.
+
+Catatan pelafalan: teks yang dikirim ke TTS memakai ejaan fonetik untuk kata serapan — misalnya "rollback" ditulis "rolbek" agar Ardi melafalkannya "rol-bek", bukan "rol-bak". Regenerasi narasi 3:
+
+```sh
+.venv/bin/edge-tts --voice id-ID-ArdiNeural --rate=+13% \
+  --text "Buat migration cukup satu perintah. Isi bagian up dan down dalam satu file. Lalu jalankan, rolbek, atau reset schema saat development." \
+  --write-media public/go-promo/03-male.wav
+```
 
 ## Caption publikasi
 
