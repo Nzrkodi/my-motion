@@ -42,7 +42,7 @@ Narasi dimulai 0,3 detik setelah tiap scene. Regenerasi contoh:
   --text "..." --write-media public/tutorial/01.wav
 ```
 
-Catatan pelafalan: teks TTS memakai ejaan fonetik untuk kata serapan bila pelafalan default melenceng (lihat catatan di `GO_BOILERPLATE_VIDEO.md`).
+Catatan pelafalan: teks TTS memakai ejaan fonetik untuk kata serapan bila pelafalan default melenceng (lihat catatan di `GO_BOILERPLATE_VIDEO.md`): "boilerplate" → "boilerpleit", "database" → "deitebeis".
 
 ## Naskah narasi
 
