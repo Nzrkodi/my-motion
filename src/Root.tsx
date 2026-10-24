@@ -3,12 +3,21 @@ import { HelloWorld } from "./HelloWorld";
 import { Logo } from "./HelloWorld/Logo";
 import { Title } from "./HelloWorld/Title";
 import { GoBoilerplatePromo } from "./GoBoilerplatePromo";
+import { GoBoilerplateTutorial } from "./GoBoilerplateTutorial";
 
 // Each <Composition> is an entry in the sidebar!
 
 export const RemotionRoot: React.FC = () => {
   return (
     <>
+      <Composition
+        id="GoBoilerplateTutorial"
+        component={GoBoilerplateTutorial}
+        durationInFrames={1770}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
       <Composition
         id="GoBoilerplatePromo"
         component={GoBoilerplatePromo}
